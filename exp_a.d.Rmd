@@ -1,0 +1,28 @@
+---
+title: "exp"
+author: "Manvydas Sokolovas"
+date: "2016 m. vasaris 24 d."
+output: html_document
+---
+
+
+Sugeneruoti du nepriklausomi eksponentiniai atsitiktiniai dydziai ir pavaizduoti grafiskai:
+
+```{r, echo=FALSE}
+x<-rexp(100)
+y<-rexp(100)
+plot(x,y)
+```
+
+x ir x^2 grafikas:
+
+```{r, echo=FALSE}
+x2<-x^2
+plot(x,x2)
+```
+
+Is pirmojo grafiko galima matyti, jog atsitiktiniai dydziai nepriklausomi ir ju reiksmes neturi jokio sarysio, yra netolygiai pasiskirste. Antrame grafike pavaizduoti du priklausomi dydziai.
+
+
+
+
