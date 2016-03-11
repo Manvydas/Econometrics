@@ -1,0 +1,45 @@
+---
+title: "Kauliukai"
+author: "Manvydas Sokolovas"
+date: "2016 m. kovas 8 d."
+output: html_document
+---
+
+Pirmasis žaidėjas meta vieną kauliuką ir fiksuojamas atsivertusių taškų skaičius. Antrasis žaidėjas meta du klausiukus ir fiksuojamas dydis: $\max(x_1, x_2)-1$, kur $x_1$ ir $x_2$ žymi pirmojo ir antrojo kauliukų iškritusių akių skaičių. Jeigu žaidėjų gautų taškų skaičiai yra lygus, tai ekspermentas kartojamas iš naujo (ir taip kartojama tol, kol galiausiai nustatomas laimėtojas). Kokia tikimybė laimėti pirmajam žaidėjui?
+
+Funkcija imituojanti kauliukų ridenimą:
+
+```{r}
+ridenimas <- function(NDice){
+  (sample(6, size=NDice, replace = TRUE))
+}
+```
+
+Pirmojo žaidėjo metimo rezultatas:
+
+```{r}
+ridenimas(1)
+```
+
+Antrojo žaidėjo metimų rezultatas:
+
+```{r}
+max(ridenimas(2))-1
+```
+
+Sugeneruota 10000 eksperimentų baigčių:
+
+```{r}
+sim = replicate(10000, ridenimas(1) > (max(ridenimas(2))-1))
+```
+
+Tikimybė, jog laimės pirmasis žaidėjas:
+```{r}
+mean(sim)
+```
+
+
+
+
+
+
