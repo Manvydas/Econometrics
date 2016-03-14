@@ -1,0 +1,45 @@
+---
+title: "Ruletė"
+author: "Manvydas Sokolovas"
+date: "2016 m. kovas 14 d."
+output: html_document
+---
+
+Europietiškoje ruletėje ruletės ratas turi 37 spalvotus, sunumeruotus langelius. Po 18 juodų ir raudonų langelių ir vieną žalią.
+Tada p1 pažymėsime tikimybę laimėti statant ant vienos spalvos, o p2 - tikimybę laimėti statant ant kitos spalvos ir žalios. n - statymų skaičius.
+
+```{r}
+n=1000
+p1=18/37
+p2=19/37
+```
+
+Funkcija imituojanti ruletės sukimą:
+
+```{r}
+rulete <- function(){
+  sum(sample(c(-1,1), size=n, replace=TRUE, prob=c(p1,p2)))
+}
+```
+
+Eksperimentas kartojamas 10000 kartų:
+
+```{r}
+losimai <- replicate(10000, rulete())
+```
+
+Tikimybė, kad balansas teigiamas:
+
+```{r}
+mean(losimai>0)
+```
+
+Apytikslė x reikšmė, kuriai galioja nelygybė P(balansas<x)=0.25:
+
+```{r}
+quantile(losimai, 0.25)
+```
+
+
+
+
