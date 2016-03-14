@@ -18,7 +18,7 @@ Funkcija imituojanti ruletės sukimą:
 
 ```{r}
 rulete <- function(){
-  sum(sample(c(-1,1), size=n, replace=TRUE, prob=c(p1,p2)))
+  sum(sample(c(1,-1), size=n, replace=TRUE, prob=c(p1,p2)))
 }
 ```
 
