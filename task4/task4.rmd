@@ -94,7 +94,7 @@ AIC(mod5)
 # Pagal ši kriterijų mod5 gerenis nei mod4.
 ```
 
-Ištirti ar duomenys nėra heteroskedastiški naudojamas ncvTest:
+Išsiaškinti ar duomenys nėra heteroskedastiški naudojamas ncvTest:
 
 ```{r}
 ncvTest(mod5)
