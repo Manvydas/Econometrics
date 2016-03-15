@@ -1,0 +1,103 @@
+---
+title: "task4"
+author: "Manvydas Sokolovas"
+date: '2016 m kovas 15 d '
+output: html_document
+---
+
+Aplanke `task4` yra duomenų failas, kuriame rasite nekilnojamo turto (o tiksliau gyvenamųjų būtų) 
+kainas ir kaikurias jų charakteristikas.
+Jūsų užduotis atlikti išsamią tiesinę regresiją. 
+Lygtis reikalinga prekybos agentams, 
+kad geriau suprastų kokią
+įtaką skirtingos charakteristikos daro galutinei kainai.
+
+Nuskaitomi duomenys:
+
+```{r}
+setwd("C:/Users/manvi_000/Desktop/MIF/Econometrics/task4")
+duom1 <- read.csv2("data.csv")
+```
+
+Sudaromas modelis:
+
+```{r}
+mod1 <- lm(kaina~plotas+aukstas+garsoIzoliacija+silumosLaidumas+atstumasIkiPrekybosCentro,data=duom1)
+```
+
+Ieškoma išsskirčių naudojant outlierTest, kuris yra "car" pakete:
+
+```{r}
+library("car")
+outlierTest(mod1)
+# Testas parodo išskirtis. Šiuo atveju tai 253 ir 254 eilutese esantys duomenys
+```
+
+Modelio grafinis atvaizdavimas:
+
+```{r}
+qqPlot(mod1, id.n=2)
+# Galima pastebėti, jog išskirtys yra 253 ir 254 eilutėse.
+```
+
+Ištrinamos išskirtis:
+
+```{r}
+duom2 <- duom1[-c(253,254),]
+```
+
+Instaliuojamas "usdm" paketas, kad veiktų VIF funkcija. Modelis tikrinamas su VIF testu. Jei kurio nors kintamojo VIF koeficientas > 10, tai yra multikolinearumo problema.
+
+```{r}
+library("usdm")
+vif(duom2)
+# VIF koeficientai prie garso izoliacijos ir šilumos laidumo yra didesni nei 10. Tai reiškia, jog turime multikolinearumo problemų.
+```
+```{r}
+plot(duom2)
+# Pagal grafiką galima matyti, jog garso izoliacija ir šilumos laidumas koreliuoja.
+```
+```{r}
+cor(duom2$garsoIzoliacija,duom2$silumosLaidumas)
+# Atlikus koreliacijos testą. Hipotezė, jog šie kintamieji stipriai koreliuoja pasitvirtina.
+```
+
+Atmetus garso izoliaciją sudaromas naujas modelis:
+
+```{r}
+
+mod2 <- lm(kaina~plotas+aukstas+silumosLaidumas+atstumasIkiPrekybosCentro,data=duom2)
+summary(mod2)
+# Kintamojo pavadinimu "atstumasIkiPrekybosCentro" t value = 1.050 < |2|.
+```
+
+Atmetus šilumos laidumą sudaromas naujas modelis:
+
+```{r}
+mod3 <- lm(kaina~plotas+aukstas+garsoIzoliacija+atstumasIkiPrekybosCentro,data=duom2)
+summary(mod3)
+# Kintamojo pavadinimu "atstumasIkiPrekybosCentro" t value = 1.047 < |2|.
+```
+
+
+
+
+
+Ištirti ar modelis nėra heteroskedastiškas naudosime ncvTest:
+
+```{r}
+ncvTest(mod2)
+# p = 0.0977223 > 0.05
+```
+
+
+
+
+
+
+
+
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
