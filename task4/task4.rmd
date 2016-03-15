@@ -40,7 +40,7 @@ qqPlot(mod1, id.n=2)
 # Galima pastebėti, jog išskirtys yra 253 ir 254 eilutėse.
 ```
 
-Ištrinamos išskirtis:
+Ištrinamos išskirtys:
 
 ```{r}
 duom2 <- duom1[-c(253,254),]
