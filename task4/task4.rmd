@@ -109,8 +109,6 @@ durbinWatsonTest(mod5)
 # p-value > 0.05 - liekanos nėra autokoreliuotos.
 ```
 
-Pagal galutinį modelį kaina priklauso nuo ploto, auksto ir garso izoliacijos. Galutinis modelis yra: kaina = 7474.4 + 599.4plotas + 334aukstas + 581.2garsoIzoliacija + e$. Koeficientai parodo kiek pakis kaina pakitus vienam iš kintamujų vienu vienetu, o kitiems išlikus pastoviais.
-=======
 
 ```{r}
 mod4 <- lm(kaina~plotas+aukstas+silumosLaidumas, data=duom2)
