@@ -80,7 +80,6 @@ summary(mod3)
 ```
 
 Abiejuose modeliuose kintamojo "atstumasIkiPrekybosCentro" t value < |2|. Tai galima teigti, jog atstumas iki prekybos centro yra statistiškai nereiksmingas kainai:
-<<<<<<< HEAD:task4/task4.Rmd
 
 ```{r}
 mod4 <- lm(kaina~plotas+aukstas+silumosLaidumas, data=duom2)
@@ -131,7 +130,6 @@ ncvTest(mod5)
 ```
 
 Tikrinama autokoreliacija:
->>>>>>> f72a3feb1cacb40e6473217b77298236c0b3f090:task4/task4.rmd
 
 ```{r}
 durbinWatsonTest(mod5)
