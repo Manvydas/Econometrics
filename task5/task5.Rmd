@@ -1,0 +1,61 @@
+---
+title: "task5"
+author: "Manvydas Sokolovas"
+date: '2016 m kovas 18 d '
+output: html_document
+---
+
+Pinigų paklausa. Šioje užduotyje reikia atlikti tiesinę regresiją. Pakete dynlm yra duomenų masyvas M1Germany - ten yra ir jo aprašymas. Iš turimų duomenų sudarykite ir įvertinkite tiesinę regresiją, kurios endogeninis kintamasis yra logm1. Lygtis būtų naudojama prognozuoti pinigų kiekį artimiausiam laikotarpiui į prieki remiantis dabartine situacija. Taigi prognozės sudarymui lygtis gali naudoti tik tuos duomenis, kurie būtų žinomi prognozavimo momentu.
+
+Atidaromi duomenys, esantys "dynlm" pakete:
+
+```{r}
+library("dynlm")
+M1Germany
+```
+
+Duomenys pavaizduojami grafiškai:
+
+```{r}
+plot(M1Germany)
+```
+
+Sudaromi keli modeliai su skirtingais lagais:
+
+```{r}
+
+mod1 <- dynlm(d(logm1)~d(L(logprice,1))+d(L(loggnp,1))+d(L(interest,1)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(mod1)
+mod2 <- dynlm(d(logm1)~d(L(logprice,2))+d(L(loggnp,2))+d(L(interest,2)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(mod2)
+mod3 <- dynlm(d(logm1)~d(L(logprice,3))+d(L(loggnp,3))+d(L(interest,3)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(mod3)
+# mod3: kintamojo "logprice" p-value mažiausias ir t-value didžiausias.
+mod4 <- dynlm(d(logm1)~d(L(logprice,4))+d(L(loggnp,4))+d(L(interest,4)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(mod4)
+# mod4: kintamujų "loggnp"" ir "interest" p-value mažiausias.
+mod5 <- dynlm(d(logm1)~d(L(logprice,5))+d(L(loggnp,5))+d(L(interest,5)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(mod5)
+
+```
+
+Iš praeitų modelių atrenkami tinkamiausi lagai ir sudaromas naujas modelis:
+
+```{r}
+modNaujas <- dynlm(d(logm1)~d(L(logprice,3))+d(L(loggnp,4))+d(L(interest,4)), data = M1Germany, start = c(1960,1), end = c(1996,3))
+summary(modNaujas)
+```
+
+Tikriname modelius pagal Akaike kriterijų:
+
+```{r}
+AIC(mod1)
+AIC(mod2)
+AIC(mod3)
+AIC(mod4)
+AIC(mod5)
+AIC(modNaujas)
+# gauname, jog modNaujas Akaike koeficientas mažiausias, tai yra modelis tinkamiausias iš pateiktų.
+```
+
+
