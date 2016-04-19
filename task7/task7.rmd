@@ -1,0 +1,58 @@
+---
+title: "task7_1"
+author: "Manvydas Sokolovas"
+date: "19 April 2016"
+output: html_document
+---
+
+### 1 užduotis:
+> The function tsdisplay(data, plot.type="scatter") is useful for showing a time plot, ACF plot and lagged scatterplot on the same graph. Use it to produce plots of the following time series: bricksq, hsales, ibmclose. Can you spot the effects of seasonality, cyclicity and trend?
+
+> Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:
+
+```{r, message=FALSE}
+library("fpp")
+```
+
+> Brėžiami duomenų "bricksq" grafikai:
+
+```{r}
+tsdisplay(bricksq, plot.type="scatter")
+```
+
+ * Sezoniškumas: matomas aiškus sezoniškumas (maži kalneliai - kasmet duomenys kyla ir leidžiasi).
+ * Ciklai: galima pastebėti ciklus (ilgi kilimai ir staigūs kritimai) apie:
+    + 1)1963-1975m.;
+    + 2)1975-1983m.;
+    + 3)1983-1991m..
+ * Trendas: iš grafiko galima įžvelgti kylanti trendą.
+
+<br>
+
+> Brėžiami duomenų "hsales" grafikai:
+
+```{r}
+tsdisplay(hsales, plot.type="scatter")
+```
+
+ * Sezoniškumas: matomas aiškus sezoniškumas (smailūs kalneliai - kasmet duomenys kyla ir leidžiasi).
+ * Ciklai: galima įžvelgti ciklus (duomenys po truputi kyla ir leidžiasi) apie:
+    + 1)1975-1982m.;
+    + 2)1982-1991m..
+ * Trendas: trendo nėra, duomenys svyruoja viename lygyje.
+
+<br>
+
+> Brėžiami duomenų "ibmclose" grafikai:
+
+```{r}
+tsdisplay(ibmclose, plot.type="scatter")
+```
+
+ * Sezoniškumas: iš grafikų galima teigti, jog sezoniškumo nėra.
+ * Ciklai: galima įžvelgti ciklus (duomenys po truputi kyla ir leidžiasi) apie:
+    + 1)0-47;
+    + 2)47-270;
+    + 3)270-364.
+ * Trendas: aiškaus trendo nėra.
+ 
