@@ -28,10 +28,10 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(bicoal, h = 20))
-plot(rwf(bicoal, h=20))
+plot(naive(bicoal, h = 20))
 plot(snaive(bicoal, h=20))
 plot(rwf(bicoal, drift=TRUE, h=20))
-# Panašu, jog geriausiai prognozuoja paskutinis grafikas (Forecasts from Random walk with drift), nes jo prognozės pasikliovimo intervalas siauriausias bei reikšmė truputi mažėjanti.
+# Geriausiai prognozuoja paskutinis grafikas (Forecasts from Random walk with drift), nes jo prognozės pasikliovimo intervalas panašu, kad yra siauriausias.
 ```
 
 **(b) Price of chicken (1924–1993). Data set chicken.**
@@ -49,10 +49,10 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(chicken, h = 35))
-plot(rwf(chicken, h=35))
+plot(naive(chicken, h=35))
 plot(snaive(chicken, h=35))
 plot(rwf(chicken, drift=TRUE, h=35))
-# Pirmąjį grafiką (Forecasts from Mean) galime atmesti, nes aiškiai matosi, jog šiuo atveju vidurkis prognozuoja netiksliai. Geriausiai prognozuoja antrasis grafikas (Forecasts from Random walk), nes trečias grafikas labiau sezoniškumui, o ketvirtas netinka, nes iš duomenų galima matyti, jog jie nebemažės.
+# Pirmąjį grafiką (Forecasts from Mean) galime atmesti, nes aiškiai matosi, jog šiuo atveju vidurkis prognozuoja netiksliai. Geriausiai prognozuoja antrasis grafikas (Forecasts from Naive method), nes trečias grafikas (Forecasts from Seasonal naive method) sezoniškumą turintiems duomenims, o šiuo atveju jo nėra. Ketvirtas (Forecasts from Random walk with drift) netinka, nes iš duomenų galima matyti, jog jie nebemažės.
 ```
 
 **(c) Monthly total of people on unemployed benefits in Australia (January 1956–July 1992). Data set dole.**
@@ -62,7 +62,7 @@ Peržiūrime duomenis, išbrėžiame grafiškai:
 ```{r}
 par(mfrow = c(1,1))
 plot(dole)
-# Iš grafiko galima įžvelgti ciklą, jog duomenys staiga pakyla ir tada kurį laiką svyruoja.
+# Iš grafiko galima įžvelgti ciklą, jog duomenys staiga pakyla ir tada kurį laiką svyruoja, bei sezoniškumą (maži kalneliai).
 ```
 
 Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
@@ -70,10 +70,10 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(dole, h = 120))
-plot(rwf(dole, h=120))
+plot(naive(dole, h=120))
 plot(snaive(dole, h=120))
 plot(rwf(dole, drift=TRUE, h=120))
-# Pirmąjį grafiką (Forecasts from Mean) galime atmesti, nes aiškiai matosi, jog šiuo atveju vidurkis prognozuoja netiksliai. Manau prognozuoti būtų tinkamiausias trečiasis grafikas (Forecasts from Seasonal naive method), nes kaip ir minėta anksčiau panašu, jog grafikas linkęs gana staigiai pakilti ir kurį laiką svyruoti. Tačiau gali būti tinkami ir kiti, nes nėra aišku ar duomenys kils ar kaip.
+# Pirmąjį grafiką (Forecasts from Mean) galime atmesti, nes aiškiai matosi, jog šiuo atveju vidurkis prognozuoja netiksliai. Manau tinkamiausias būtų trečiasis grafikas (Forecasts from Seasonal naive method), nes kaip ir minėta anksčiau panašu, jog duomenys yra sezoniški. Tačiau gali būti tinkamas ir ketvirtasis (Forecasts from Random walk with drift), nes galbūt duomenų reikšmės prognozuojamu laikotarpiu kils.
 ```
 
 **(d) Monthly total of accidental deaths in the United States (January 1973–December 1978). Data set usdeaths.**
@@ -91,10 +91,10 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(usdeaths, h = 24))
-plot(rwf(usdeaths, h=24))
+plot(naive(usdeaths, h=24))
 plot(snaive(usdeaths, h=24))
 plot(rwf(usdeaths, drift=TRUE, h=24))
-# Šiuo atveju akivaizdu, kad geriausiai prognozuoja trečiasis grafikas(Forecasts from Seasonal naive method). Nes duomenys akivaizdžiai yra sezoniški, tai ir testas tinkamiausias remiantis sezoniškumu.
+# Šiuo atveju akivaizdu, kad geriausiai prognozuoja trečiasis grafikas (Forecasts from Seasonal naive method). Nes duomenys akivaizdžiai yra sezoniški.
 ```
 
 **(e) Quarterly production of bricks (in millions of units) at Portland, Australia (March 1956–September 1994). Data set bricksq.**
@@ -112,10 +112,10 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(bricksq, h =40 ))
-plot(rwf(bricksq, h=40))
+plot(naive(bricksq, h=40))
 plot(snaive(bricksq, h=40))
 plot(rwf(bricksq, drift=TRUE, h=40))
-# Mano manimu, geriausiai prognozuoja trečiasis grafikas (Forecasts from Seasonal naive method), nes duomenys ir toliau liks sezoniški. Bet gali būti remiamasi ir ketvirtuoju grafiku (Forecasts from Random walk with drift), nes namai bus ir toliau statomi, tai tikėtina, kad ir plytų daugiau reikės.
+# Mano manimu, geriausiai prognozuoja trečiasis grafikas (Forecasts from Seasonal naive method), nes duomenys yra sezoniški. Bet gali būti remiamasi ir ketvirtuoju grafiku (Forecasts from Random walk with drift), nes namai bus ir toliau statomi, tai tikėtina, kad ir plytų paklausa augs.
 ```
 
 **(f) Annual Canadian lynx trappings (1821–1934). Data set lynx.**
@@ -133,8 +133,8 @@ Išbrėžiame grafikus pagal visus keturis sąlygoje pateiktus metodus:
 ```{r}
 par(mfrow = c(2,2))
 plot(meanf(lynx, h = 25))
-plot(rwf(lynx, h=25))
+plot(naive(lynx, h=25))
 plot(snaive(lynx, h=25))
 plot(rwf(lynx, drift=TRUE, h=25))
-# Manau geriausiai prognozuoja antrasis (Forecasts from Random walk) ir trečiasis (Forecasts from Seasonal naive method) grafikai. Taip pat galima būtų patobulinti pridedant ciklus.
+# Manau geriausiai prognozuoja antrasis (Forecasts from Naive method), nes duomenys nėra sezoniški, tai trečias (Forecasts from Seasonal naive method) netinka. Ketvirtas (Forecasts from Random walk with drift) rodo kilima, ko manau nebus.
 ```
