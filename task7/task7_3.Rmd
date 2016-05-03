@@ -1,0 +1,95 @@
+---
+title: "task7_3"
+author: "Manvydas Sokolovas"
+date: "20 April 2016"
+output: html_document
+---
+
+**Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:**
+```{r, message=FALSE}
+library("fpp")
+```
+
+
+### 3 užduotis:
+**For the data set bricksq:**
+
+**(a)Split the data into two parts using:**
+```{r}
+bricks1 <- window(bricksq, end=1987.99)
+bricks2 <- window(bricksq, start=1988)
+```
+
+**(b)Check that your data have been split appropriately by producing the following plot:**
+```{r}
+plot(bricksq, xlab="Metai", ylab="Duomenys")
+legend("topleft", legend=c("1956-1987m.", "1988-1994m."), col=c("red","blue"), lwd=2, cex=1)
+lines(bricks1, col="red", lwd=2)
+lines(bricks2, col="blue", lwd=2)
+```
+
+**(c)Calculate forecasts using each of the four benchmark methods applied to bricks1.**
+```{r}
+par(mfrow = c(2,2))
+avg <- meanf(bricks1, h =25)             #prognozė pagal duomenų vidurkį
+plot(avg)
+
+naive <- naive(bricks1, h=25)            #prognozė pagal paskutinę duomenų reikšmę
+plot(naive)
+
+season <- snaive(bricks1, h=25)          #prognozė pagal sezoniškumą
+plot(season)
+
+drift <- rwf(bricks1, drift=TRUE, h=25)  #prognozė pagal paskutinę reikšmę bei prideda vidutinį svyravimą praeityje
+plot(drift)
+```
+
+ * Galima spėti, jog geriausiai prognozuoja trečiasis grafikas (Forecasts from Seasonal naive method), nes duomenys yra sezoniški.
+ 
+**(d)Compare the accuracy of your forecasts against the actual values stored in bricks2.**
+```{r}
+accuracy(avg,bricks2)
+accuracy(naive,bricks2)
+accuracy(season,bricks2)
+accuracy(drift,bricks2)
+```
+
+**(e) Which method does best? Why?**
+
+ * Iš (d) dalies galima matyti, jog "Seasonal naive" prognozės Training set ir Test set reikšmės poromis mažiausiai skiriasi palyginus su kitais prognozavimo metodais, taigi galima teigti, jog "Seasonal naive" metodas geriau prognozuoja nei kiti.
+
+Vienoje ploštumoje išbrėžiami tikrųjų duomenų bei visų prognozių grafikai:
+```{r}
+plot(bricksq, xlab="Metai", ylab="Duomenys", lwd=2)
+lines(avg$mean,col="purple",lwd=2)
+lines(naive$mean, col="blue", lwd=2)
+lines(season$mean, col="red", lwd=2)
+lines(drift$mean, col="green", lwd=2)
+legend("topleft", legend=c("Mean", "Naive", "Seasonal", "Drift"), col=c("purple", "blue", "red", "green"), lwd=2, cex=1)
+```
+
+ * Iš šio grafiko taip pat galima matyti, jog "Seasonal" metodas prognozuoja tiksliausiai. Tai yra jo reikšmės panašiausios į turimų duomenų.
+ 
+
+**(f) For the best method, compute the residuals and plot them. For example:**
+```{r}
+res <- residuals(season)
+plot(res)
+hist(res, breaks="FD")
+```
+
+ * Iš grafiko galima matyti, jog liekanos nėra pasiskirsčiusios ties nuliu bei reikšmės vis didėja. Tačiau iš histogramos panašu, jog liekanos pasiskirste pagal normalųjį skirstinį ir reikšmės labiausiai susitelke ties nuliu.
+
+```{r}
+Acf(res)
+```
+
+ * ACF rodo reikšmingą autokoreliaciją prie 1, 2, 5, 6, 7, 8 ir 9 lagų (kur stulpeliai kerta mėlyną puktyrinę liniją).
+
+
+Atliksime Ljung-Box testą, su H0 hipoteze, kad duomenų liekanos yra baltasis triukšmas ir alternatyva, kad nėra.
+```{r}
+Box.test(res, fitdf=0, type="Lj")
+```
+
+ * p-value < 0.05, H0 atmetame. Liekanos nėra baltasis triukšmas (liekanos koreliuoja).

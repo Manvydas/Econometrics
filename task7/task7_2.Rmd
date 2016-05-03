@@ -1,0 +1,119 @@
+---
+title: "task7_2"
+author: "Manvydas Sokolovas"
+date: "25 April 2016"
+output: html_document
+---
+
+**Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:**
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 2 užduotis:
+**2. For each of the same series (bricksq, ibmclose, hsales):**
+
+**(a) Use either the naive or seasonal naive forecasting method and apply it to the full data set.**
+
+Grafikai prognozių "bricksq" duomenims:
+```{r}
+par(mfrow = c(2,1))
+plot(naive(bricksq, h=25))  # Naive metodas
+plot(snaive(bricksq, h=25)) # Seasonal naive metodas
+```
+
+* Duomenys yra sezonški, tai todėl ir iš grafikų galima teigti, jog šiuo atveju geriau prognozuoja "Seasonal naive" metodas, kuris atsižvelgia į sezoniškumą.
+
+<br>
+
+Grafikai prognozių "ibmclose" duomenims:
+```{r}
+par(mfrow = c(2,1))
+plot(naive(ibmclose, h=60))  # Naive metodas
+plot(snaive(ibmclose, h=60)) # Seasonal naive metodas
+```
+
+* Šiuo atveju geriau prognozuoja "Naive" metods, nes duomenys nėra sezoniški.
+
+<br>
+
+Grafikai prognozių "hsales" duomenims:
+```{r}
+par(mfrow = c(2,1))
+plot(naive(hsales, h=30))  # Naive metodas
+plot(snaive(hsales, h=30)) # Seasonal naive metodas
+```
+
+* Šiuo atveju labiau tinkamas "Seasonal naive" metodas, nes jis atsižvelgia į duomenų sezoniškumą.
+
+<br>
+
+**(b) Compute the residuals and plot their ACF. Do the residuals appear to be white noise? What did your forecasting method miss?**
+
+"bricksq":
+```{r}
+res1 <- residuals(snaive(bricksq, h=25))
+Acf(res1)
+```
+
+* ACF rodo reikšmingą autokoreliaciją prie 1,2,3,5,6,7,8,9,10,16,17,18 ir 19 lagų (kur stulpeliai kerta mėlyną puktyrinę liniją). Aiškiai matomas sezoniškumas. Taigi liekanos nėra baltasis triukšmas. Prognozę galbūt galima būtų patobulinti pridėjus trendą ar ciklus.
+
+<br>
+
+"ibmclose":
+```{r}
+res2 <- residuals(naive(ibmclose, h=60))
+Acf(res2)
+```
+
+* ACF grafike tik trys stulpeliai nežymiai kerta mėlyna punktyrinę liniją, taigi galima spėti, jog liekanos yra baltasis triukšmas. Jeigu liekanos yra baltasis triukšmas, tai prognozę būtų sunku patobulinti.
+
+<br>
+
+"hsales":
+```{r}
+res3 <- residuals(snaive(hsales, h=30))
+Acf(res3)
+```
+
+* Iš ACF grafiko galima matyti, jog daugelyje lagų stulpeliai kerta mėlyną punktyrą ir tai rodo reikšmingą autokoreliaciją. Aiškiai matomas sezoniškumas. Taigi liekanos nėra baltasis triukšmas. Prognozę galbūt galima būtų patobulinti pridėjus trendą ar ciklus.
+
+<br>
+
+**(c) Do a Ljung-Box test on the residuals. What do the results mean?**
+
+H0: liekanos yra baltasis triukšmas
+
+H1: liekanos nėra baltasis triukšmas
+
+<br>
+
+"bricksq":
+```{r}
+Box.test(res1, fitdf=0, type="Lj")
+```
+
+* p-value < 0.05, H0 atmetame. Liekanos nėra baltasis triukšmas (liekanos koreliuoja). Spėjimas pasitvirtino.
+
+<br>
+
+"ibmclose":
+```{r}
+Box.test(res2, fitdf=0, type="Lj")
+```
+
+* p-value > 0.05, H0 priimama. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja). Spėjimas pasitvirtino.
+
+<br>
+
+"hsales":
+```{r}
+Box.test(res3, fitdf=0, type="Lj")
+```
+
+* p-value < 0.05, H0 atmetame. Liekanos nėra baltasis triukšmas (liekanos koreliuoja). Spėjimas pasitvirtino.
+
+<br>
+
+
+

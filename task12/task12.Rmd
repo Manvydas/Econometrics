@@ -1,0 +1,96 @@
+---
+title: "task12"
+author: "Manvydas Sokolovas"
+date: "3 May 2016"
+output: html_document
+---
+
+Užkraunamas "fpp" paketas:
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 1 užduotis:
+For this exercise, use the monthly Australian short-term overseas visitors data, May 1985–April 2005. (Data set: visitors in expsmooth package.)
+```{r, message=FALSE}
+library("expsmooth")
+```
+
+(a) Use ets to find the best model for these data and record the training set RMSE. You should find that the best model is ETS(M,A,M).
+```{r}
+frc1 <- ets(visitors); frc1[13]
+rmse1<-accuracy(frc1)[2]; rmse1
+```
+
+* Matome, jog geriausia modeli ir pasirinko ETS(M,A,M) bei RMSE = 15.07221.
+
+(b) We will now check how much larger the one-step RMSE is on out-of-sample data using time series cross-validation. The following code will compute the result, beginning with four years of data in the training set. Check that you understand what the code is doing. Ask if you don’t.
+```{r}
+k <- 48 # minimum size for training set
+n <- length(visitors) # Total number of observations
+e <- visitors*NA # Vector to record one-step forecast errors
+for(i in 48:(n-1))
+  {
+  train <- ts(visitors[1:i],freq=12)
+  fit <- ets(train, "MAM", damped=FALSE)
+  fc <- forecast(fit,h=1)$mean
+  e[i] <- visitors[i+1]-fc
+  }
+rmse2 <- sqrt(mean(e^2,na.rm=TRUE)); rmse2
+```
+
+* Skaičiuoja paklaidas tarp prognozės reikšmių bei turimų duomenų reikšmių. Ieško RMSE.
+* Iš šio ciklo, gauname RMSE = 18.31503. Jis yra didesnis nei prieš tai gautas. Čia paklaidos yra skaičiuojamos tarp prognozės ir žinomų reikšmių.
+
+(c) What would happen in the above loop if I had set train <- visitors[1:i]?
+```{r, error=TRUE}
+k1 <- 48 # minimum size for training set
+n1 <- length(visitors) # Total number of observations
+e1 <- visitors*NA # Vector to record one-step forecast errors
+for(i in 48:(n1-1))
+  {
+  train1 <- visitors[1:i]
+  fit1 <- ets(train1, "MAM", damped=FALSE)
+  fc1 <- forecast(fit1,h=1)$mean
+  e1[i] <- visitors[i+1]-fc1
+  }
+sqrt(mean(e1^2,na.rm=TRUE))
+```
+
+* Atlikus pakeitimus meta klaidą, nebeapskaičiuoja RMSE. Taip yra, nes duomenys nebepriklauso laiko eilučių klasei.
+
+(d) Plot e. What do you notice about the error variances? Why does this occur?
+```{r}
+plot(e)
+plot(visitors)
+```
+
+* Matome, jog paklaidų svyravimai vis didėja. Taip gali būti, nes ir duomenų sklaida auga.
+
+(e) How does this problem bias the comparison of the RMSE values from (1a) and (1b)? (Hint: think about the effect of the missing values in e.)
+
+* 1a RMSE mažesnis už 1b. Tai lemia ne vienodas duomenų skaičius prognozei - 1a daugiau duomenų. RMSE atsižvelgia į turimus duomenis bei prognoze, todėl kai daugiau duomenų gaunasi paklaidos mažesnės.
+
+(f) In practice, we will not know that the best model on the whole data set is ETS(M,A,M) until we observe all the data. So a more realistic analysis would be to allow ets to select a different model each time through the loop. Calculate the RMSE using this approach. (Warning: it will take a while as there are a lot of models to fit.)
+```{r}
+for(i in 48:(n-1))
+  {
+  train <- ts(visitors[1:i],freq=12)
+  fit <- ets(train)
+  fc <- forecast(fit,h=1)$mean
+  e[i] <- visitors[i+1]-fc
+  }
+rmse3 <- sqrt(mean(e^2,na.rm=TRUE)); rmse3
+```
+
+* Gauname RMSE=18.62526
+
+(g) How does the RMSE computed in (1f) compare to that computed in (1b)? Does the re-selection of a model at each step make much difference?
+
+* b dalies RMSE=18.31503, o f dalies RMSE=18.62526. Taigi reikšmingo skirtumo tarp šių reikšmių nėra ir nėra didelio skirtumo kurį metodą rinktis. Tačiau patartina būtų pirmąjį, nes nėra prasmės kiekvieną kartą leisti išbandyti visus galimus ETS modelius, nes tai užgaišta laiko.
+
+
+
+
+
+

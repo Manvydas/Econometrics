@@ -1,0 +1,77 @@
+---
+title: "task11"
+author: "Manvydas Sokolovas"
+date: "3 May 2016"
+output: html_document
+---
+
+**Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:**
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 1 užduotis:
+Use ets() to find the best ETS model for the price of eggs (data set eggs). How does this model compare to the one you found in the previous lab session?
+
+Pasinaudoje ets() ieškome geriausio ETS modelio kiaušinių kainai prognozuoti:
+```{r}
+frc1 <- ets(eggs)
+frc1
+plot(forecast(frc1, h=100))
+lines(fitted(frc1), col="red")
+```
+
+* Raudona linija rodo prognozės palyginimą su duomenimis.
+
+Geriausia prognozė iš praeitų užduočių:
+```{r}
+frc2 <- holt(eggs, h=100, exponential=TRUE, alpha=0.8, beta=NULL)
+plot(frc2, main="Prognozė su eksponentiniu trendu")
+lines(fitted(frc2), col="green")
+```
+
+* Iš grafikų labai sunku pasakyti kuri prognozė yra geresnė.
+
+Tikrinama kuris modelis geresnis naudojant accuracy testą (RMSE mažesnis - geriau):
+```{r}
+accuracy(frc1)
+accuracy(frc2)
+```
+
+* Antrojo modelio RMSE mažesnis, tačiau labai nežymiai.
+
+Tikriname pagal AIC (kuo mažesnis tuo geriau):
+```{r}
+frc1[2]
+frc2$model[2]
+```
+
+* Pirmojo modelio AIC mažesni, tačiau taip pat labai nežymiai.
+
+Tikrinama abiejų modelių liekanų autokoreliacija:
+```{r}
+Acf(frc1$res)
+Acf(frc2$res)
+```
+
+* AFC grafikai labai panašūs, sunku įžvelgti skirtumus. Panašu, jog abiejų modelių liekanos yra baltasis triukšmas.
+
+H0: liekanos yra baltasis triukšmas
+
+H1: liekanos nėra baltasis triukšmas
+```{r}
+Box.test(frc1$res, fitdf=0, type="Lj")
+Box.test(frc2$res, fitdf=0, type="Lj")
+```
+
+* Abiejų modelių p-value > 0.05. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja).
+
+Išbrėžiamos abi prognozės kartu:
+```{r}
+plot(eggs, xlim=c(1900,2100), ylim=c(-20,400), lwd=2)
+lines(forecast(frc1, h=100)$mean, col="red", lwd=2)
+lines(frc2$mean, col="green", lwd=2)
+legend("topright", legend=c("ETS", "eksponentinis"), col=c("red", "green"), lwd=2, cex=1)
+```
+
+*  Pagal atliktus testus galima būtų teigti, jog abu pateikti modeliai yra ekvivalentūs, nes testų reikšmės skiriasi labai nežymiai. Tačiau iš grafiko man priimtinesnė atrodo pirmoji prognozė (ETS), nes panašu, jog kiaušinių kaina nebekris tiek, nedalins jų nemokamai.

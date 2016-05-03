@@ -1,0 +1,80 @@
+---
+title: "task10_2"
+author: "Manvydas Sokolovas"
+date: "25 April 2016"
+output: html_document
+---
+
+**Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:**
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 2 užduotis:
+For this exercise, use the monthly Australian short-term overseas visitors data, May 1985–April 2005. (Data set: visitors.)
+(a) Make a time plot of your data and describe the main features of the series.
+(b) Forecast the next two years using Holt-Winters’ multiplicative method.
+(c) Why is multiplicative seasonality necessary here?
+(d) Experiment with making the trend exponential and/or damped.
+(e) Compare the RMSE of the one-step forecasts from the various methods. Which do you prefer?
+(f) Check that the residuals from the best model look like white noise.
+
+(a) Peržiūrimi duomenys:
+```{r}
+dat <- visitors
+plot(dat)
+tsdisplay(dat, plot.type="scatter")
+```
+
+* Iš pirmojo ir ACF grafikų galima matyti, jog duomenys yra sezoniški, bei turi didėjanti trendą, tačiau jis silpsta.
+
+(b) Prognozuojami du metai naudojantis Holt-Winters' multiplikatyviu metodu:
+```{r}
+frc <- hw(dat, seasonal="mult", h=24)
+plot(frc)
+lines(frc$fitted, col="red")
+```
+
+(c) Būtinas, nes einant metams sezoniškumo įtaka vis didėja, o šis metodas į tai ir atsižvelgia.
+
+(d) Sukūriamos kelios prognozės su skirtingais trendais:
+```{r}
+frc2<-hw(dat, seasonal="mult", h=24, damped = TRUE)
+plot(frc2)
+lines(frc2$fitted, col=3)
+
+frc3<-hw(dat, seasonal="mult", h=24, exponential=TRUE)
+plot(frc3)
+lines(frc3$fitted, col=4)
+
+frc4<-hw(dat, seasonal="mult", h=24, damped = TRUE, exponential=TRUE)
+plot(frc4)
+lines(frc4$fitted, col=5)
+```
+
+* Šiuo atveju labiausiai tinkami atrodo frc2 bei frc4 metodai, nes iš pradinių duomenų panašu, jog trendas yra mažėjantis, o šios prognozės ir slopina jį.
+
+(e) Ieškomas geriausias modelis (RMSE mažiausias):
+```{r}
+accuracy(frc)
+accuracy(frc2)
+accuracy(frc3)
+accuracy(frc4)
+```
+
+* Galime matyti, jog ketvirtojo modelio RMSE mažiausias, tai jis yra geriausias iš pateiktų.
+
+(f) Tikrinamos liekanos, ar panašios į baltajį triukšmą:
+```{r}
+Acf(frc4$res)
+Box.test(frc4$res, fitdf=0, type="Lj")
+#H0: liekanos yra baltasis triukšmas
+#H1: liekanos nėra baltasis triukšmas
+```
+
+* Iš ACF grafiko galima matyti, jog tik trys reikšmės rodo reikšmingą autokoreliacija ir labai nežymiai kerta mėlyną punktyrą.
+* p-value > 0.05, H0 priimama. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja). 
+
+> Taigi galima būtų daryti išvada, jog šis modelis yra gana geras, t.y. prognozė su damped bei eksponentiniu trendu geriausiai prognozuoja iš sudarytų modelių.
+
+

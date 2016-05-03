@@ -1,0 +1,90 @@
+---
+title: "task10_1"
+author: "Manvydas Sokolovas"
+date: "25 April 2016"
+output: html_document
+---
+
+**Užkraunamas "fpp" paketas. Toliau bus naudojami duomenys iš jo:**
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 1 užduotis:
+For this exercise, use the price of a dozen eggs in the United States from 1900–1993 (data set eggs). Experiment with the various options in the holt() function to see how much the forecasts change with damped or exponential trend. Also try changing the parameter values for α and β to see how they affect the forecasts. Try to develop an intuition of what each parameter and argument is doing to the forecasts. [Hint: use h=100 when calling holt() so you can clearly see the differences between the various options when plotting the forecasts.]
+
+Which model gives the best RMSE?
+
+Do the residuals from the best model look like white noise?
+
+Peržiūrimi duomenys:
+```{r}
+duom <- eggs
+plot(duom)
+```
+
+* Iš grafiko galima matyti, jog duomenys turi mažėjanti trendą, taip pat galima įžvelgti cikliškumą.
+
+Prognozės su damped trendu:
+```{r}
+fc1 <- holt(duom, h=100, damped=TRUE, alpha=0.08, beta=0.001)
+plot(fc1, main="Prognozė su damped trendu")
+lines(fitted(fc1), col="yellow")
+```
+
+* Iš grafiko galima matyti, jog kai damped=TRUE, tai trumpo laikotarpio prognozės turi trendą, o ilgu laikotarpiu jį praranda - t.y. vidurkis tampa konstanta.
+* Parametras alpha - glodina duomenis, beta - glodina pagal alpha jau suglodintus duomenis. Matome prognozė gana iškreipta, nes kai alpha mažas labiau atsižvelgiama į senesnes reikšmes ir matosi prognozės šuolis.
+
+Prognozė su eksponentiniu trendu:
+```{r}
+fc2 <- holt(duom, h=100, exponential=TRUE, alpha=0.8, beta=NULL)
+plot(fc2, main="Prognozė su eksponentiniu trendu")
+lines(fitted(fc2), col="green")
+```
+
+* Eksponentinis trendas apriboja prognozę tik teigiamomis reikšmėmis.
+
+Prognozė su multiplikatyviu trendu:
+```{r}
+fc3 <- holt(duom, h=100, damped=TRUE, exponential=TRUE, alpha=0.8, beta=0.0001)
+plot(fc3, main="Prognozė su multiplikatyviu trendu")
+lines(fitted(fc3), col="red")
+```
+
+* Panašu, jog ši prognozė tiksliausia, nes damped=TRUE panaikino trendą, o eksponential=TRUE leidžia prognozei įgyti tik teigiamas reikšmes (kiaušinių kaina negali dar daug mažėti ar tapti neigiama).
+
+Galime palyginti duomenis bei prognozes grafiškai visas kartu:
+```{r}
+plot(duom, xlim=c(1900,2100), ylim=c(-100,400), lwd=2)
+lines(fc1$mean, col="yellow", lwd=2)
+lines(fc2$mean, col="green", lwd=2)
+lines(fc3$mean, col="red", lwd=2)
+legend("topright", legend=c("damped", "eksponentinis", "multiplikatyvus"), col=c("yellow", "green", "red"), lwd=2, cex=1)
+```
+
+Tikrinama kuris modelis yra geriausias (šiuo atveju RMSE mažiausias):
+```{r}
+accuracy(fc1)
+accuracy(fc2)
+accuracy(fc3)
+```
+
+* Antrojo metodo RMSE mažiausias, taigi galima būtų teigti, jog šis modelis prognozuoja geriausiai iš pateiktų.
+
+Tikrinamos liekanos, ar panašios į baltajį triukšmą:
+```{r}
+Acf(fc2$res)
+Box.test(fc2$res, fitdf=0, type="Lj")
+#H0: liekanos yra baltasis triukšmas
+#H1: liekanos nėra baltasis triukšmas
+```
+
+* Iš ACF grafiko galima matyti, jog tik viena reikšmė rodo reikšmingą autokoreliacija (nežymiai kerta mėlyną punktyrą).
+* p-value > 0.05, H0 priimama. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja). 
+
+> Taigi galima būtų daryti išvada, jog antrasis modelis yra gana geras, t.y. prognozė su eksponentiniu trendu ir alpha=0.8.
+
+
+
+
+
