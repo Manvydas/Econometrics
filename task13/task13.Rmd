@@ -5,26 +5,123 @@ date: "3 May 2016"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Užkraunamas "fpp" paketas:
+```{r, message=FALSE}
+library("fpp")
 ```
 
-## R Markdown
+### 1 užduotis:
+1. For the following series, find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Turimų duomenų (juodi) bei duomenų po transformacijos (mėlyni) grafikai:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+(a) usnetelec
+```{r}
+plot(usnetelec, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l1 <- BoxCox.lambda(usnetelec); l1 # Transformacijos lambda
+n1 <- ndiffs(usnetelec); n1 # Diferenciavimo eilė
+plot(diff(BoxCox(usnetelec, lambda = l1), diff = n1), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(usnetelec, lambda = l1), diff = n1))
 ```
 
-## Including Plots
+* Duomenys turi didėjantį trendą - nestacionarūs.
+* Iš antrojo grafiko, vaizduojančio duomenis po transformacijos ir `r n1` eilės diferencijavimo, galima spėti, jog duomenys nėra stacionarūs.
+* Mūsų spėjimą patvirtina "kpss.test" p-value < 0.05, H0 hipotezė atmetama, tai duomenys nėra stacionarūs.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Diferencijuojame duomenis du kartus:
+```{r}
+plot(diff(BoxCox(usnetelec, lambda = l1), diff = 2), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(usnetelec, lambda = l1), diff = 2))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+* Panašu, jog duomenys tapo stacionarūs. Tai patvirtina ir "kpss.test" p-value = 0.1 > 0.05, tai H0 hipotezė priimama, duomenys yra stacionarūs.
+
+(b) usgdp
+```{r}
+plot(usgdp, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l2 <- BoxCox.lambda(usgdp); l2 # Transformacijos lambda
+n2 <- ndiffs(usgdp); n2 # Diferenciavimo eilė
+plot(diff(BoxCox(usgdp, lambda = l2), diff = n2), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(usgdp, lambda = l2), diff = n2))
+```
+
+* Duomenys turi didėjantį trendą - nestacionarūs.
+* Iš antrojo grafiko (vaizduojančio duomenis po transformacijos ir `r n2` eilės diferencijavimo) panašu, jog duomenys po transformacijos yra stacionarūs.
+* p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
+
+(c) mcopper
+```{r}
+plot(mcopper, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l3 <- BoxCox.lambda(mcopper); l3 # Transformacijos lambda
+n3 <- ndiffs(mcopper); n3 # Diferenciavimo eilė
+plot(diff(BoxCox(mcopper, lambda = l3), diff = n3), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(mcopper, lambda = l3), diff = n3))
+```
+
+* Panašu, jog duomenys turi didėjanti trendą bei yra sezoniški - nestacionarūs.
+* Iš antrojo grafiko (vaizduojančio duomenis po transformacijos ir `r n3` eilės diferencijavimo) galima manyti, jog duomenys yra stacionarūs.
+* p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
+
+(d) enplanements
+```{r}
+plot(enplanements, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l4 <- BoxCox.lambda(enplanements); l4 # Transformacijos lambda
+n4 <- ndiffs(enplanements); n4 # Diferenciavimo eilė
+plot(diff(BoxCox(enplanements, lambda = l4), diff = n4), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(enplanements, lambda = l4), diff = n4))
+```
+
+* Duomenys yra sezoniški bei turi kylantį trendą - nestacionarūs.
+* Pagal antrąjį grafiką (vaizduojančio duomenis po transformacijos ir `r n4` eilės diferencijavimo) panašu, jog duomenys yra stacionarūs.
+* p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
+
+(e) visitors
+```{r}
+plot(visitors, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l5 <- BoxCox.lambda(visitors); l5 # Transformacijos lambda
+n5 <- ndiffs(visitors); n5 # Diferenciavimo eilė
+plot(diff(BoxCox(visitors, lambda = l5), diff = n5), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(visitors, lambda = l5), diff = n5))
+```
+
+* Duomenys yra sezoniški bei turi kylantį trendą - nestacionarūs.
+* Pagal antrąjį grafiką (vaizduojančio duomenis po transformacijos ir `r n5` eilės diferencijavimo) panašu, jog duomenys yra stacionarūs.
+* p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
+
+2. Why is a Box-Cox transformation unhelpful for the cangas data?
+```{r}
+plot(cangas, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l6 <- BoxCox.lambda(cangas); l6 # Transformacijos lambda
+plot(BoxCox(cangas, lambda = l6), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+```
+
+* Duomenys turi didėjantį trendą bei yra sezoniški.
+* Box-Cox transformacija šiuo atveju nėra naudinga, nes pradiniai duomenys pradžioje ir pabaigoje svyruoja panašiai, o per vidurį svyravimai yra didžiausi.
+
+3. Download the data at http://robjhyndman.com/data/retail.xls. Choose one of the series and find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
+
+Duomenys įkelti į task13 aplanką GitHub'e. Nuskaitomi duomenys:
+```{r}
+duomvisi <- read.csv2("retail.csv", header = TRUE)
+duom9 <- duomvisi[,9]
+duom <- ts(duom9, frequency=12, start=c(1982,4))
+plot(duom, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+```
+
+* Panašu, jog duomenys yra sezoniški ir turi didėjantį trendą.
+
+Atliekama Box-Cox transformacija, diferencijuojami duomenys, išbrėžiami grafiškai:
+```{r}
+l7 <- BoxCox.lambda(duom); l7 # Transformacijos lambda
+n7 <- ndiffs(duom); n7 # Diferenciavimo eilė
+plot(diff(BoxCox(duom, lambda = l7), diff = n7), col = "blue", main = "Duomenys po transformacijos bei diferencijuoti")
+kpss.test(diff(BoxCox(duom, lambda = l7), diff = n7))
+```
+
+* Išbrėžus grafiką (vaizduojančio duomenis po transformacijos ir `r n7` eilės diferencijavimo) panašu, jog duomenys yra stacionarūs.
+* p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
+
+
+
+
+
