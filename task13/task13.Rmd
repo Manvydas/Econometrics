@@ -11,11 +11,11 @@ library("fpp")
 ```
 
 ### 1 užduotis:
-1. For the following series, find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
+####1. For the following series, find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
 
-Turimų duomenų (juodi) bei duomenų po transformacijos (mėlyni) grafikai:
+Turimų duomenų (juodi) bei duomenų po transformacijos (mėlyni) grafikai, transformacijos, diferencijavimas, atliekamas "kpss.test":
 
-(a) usnetelec
+**(a) usnetelec**
 ```{r}
 plot(usnetelec, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l1 <- BoxCox.lambda(usnetelec); l1 # Transformacijos lambda
@@ -36,7 +36,7 @@ kpss.test(diff(BoxCox(usnetelec, lambda = l1), diff = 2))
 
 * Panašu, jog duomenys tapo stacionarūs. Tai patvirtina ir "kpss.test" p-value = 0.1 > 0.05, tai H0 hipotezė priimama, duomenys yra stacionarūs.
 
-(b) usgdp
+**(b) usgdp**
 ```{r}
 plot(usgdp, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l2 <- BoxCox.lambda(usgdp); l2 # Transformacijos lambda
@@ -49,7 +49,7 @@ kpss.test(diff(BoxCox(usgdp, lambda = l2), diff = n2))
 * Iš antrojo grafiko (vaizduojančio duomenis po transformacijos ir `r n2` eilės diferencijavimo) panašu, jog duomenys po transformacijos yra stacionarūs.
 * p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
 
-(c) mcopper
+**(c) mcopper**
 ```{r}
 plot(mcopper, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l3 <- BoxCox.lambda(mcopper); l3 # Transformacijos lambda
@@ -62,7 +62,7 @@ kpss.test(diff(BoxCox(mcopper, lambda = l3), diff = n3))
 * Iš antrojo grafiko (vaizduojančio duomenis po transformacijos ir `r n3` eilės diferencijavimo) galima manyti, jog duomenys yra stacionarūs.
 * p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
 
-(d) enplanements
+**(d) enplanements**
 ```{r}
 plot(enplanements, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l4 <- BoxCox.lambda(enplanements); l4 # Transformacijos lambda
@@ -75,7 +75,7 @@ kpss.test(diff(BoxCox(enplanements, lambda = l4), diff = n4))
 * Pagal antrąjį grafiką (vaizduojančio duomenis po transformacijos ir `r n4` eilės diferencijavimo) panašu, jog duomenys yra stacionarūs.
 * p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
 
-(e) visitors
+**(e) visitors**
 ```{r}
 plot(visitors, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l5 <- BoxCox.lambda(visitors); l5 # Transformacijos lambda
@@ -88,7 +88,9 @@ kpss.test(diff(BoxCox(visitors, lambda = l5), diff = n5))
 * Pagal antrąjį grafiką (vaizduojančio duomenis po transformacijos ir `r n5` eilės diferencijavimo) panašu, jog duomenys yra stacionarūs.
 * p-value > 0.05. H0 hipotezė priimama. Duomenys yra stacionarūs.
 
-2. Why is a Box-Cox transformation unhelpful for the cangas data?
+<br>
+
+####2. Why is a Box-Cox transformation unhelpful for the cangas data?
 ```{r}
 plot(cangas, main = "Pradiniai duomenys") # Turimų duomenų grafikas
 l6 <- BoxCox.lambda(cangas); l6 # Transformacijos lambda
@@ -98,7 +100,9 @@ plot(BoxCox(cangas, lambda = l6), col = "blue", main = "Duomenys po transformaci
 * Duomenys turi didėjantį trendą bei yra sezoniški.
 * Box-Cox transformacija šiuo atveju nėra naudinga, nes pradiniai duomenys pradžioje ir pabaigoje svyruoja panašiai, o per vidurį svyravimai yra didžiausi.
 
-3. Download the data at http://robjhyndman.com/data/retail.xls. Choose one of the series and find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
+<br>
+
+####3. Download the data at http://robjhyndman.com/data/retail.xls. Choose one of the series and find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.
 
 Duomenys įkelti į task13 aplanką GitHub'e. Nuskaitomi duomenys:
 ```{r}
