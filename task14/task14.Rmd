@@ -1,0 +1,264 @@
+---
+title: "task14"
+author: "Manvydas Sokolovas"
+date: "10 May 2016"
+output: html_document
+---
+
+Užkraunamas "fpp" paketas:
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 1 užduotis:
+####For the wmurders data:
+**(a) if necessary, find a suitable Box-Cox transformation for the data;**
+```{r}
+plot(wmurders, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+l <- BoxCox.lambda(wmurders); l # Transformacijos lambda
+plot(BoxCox(wmurders, lambda = l), col = "blue", main = "Duomenys po transformacijos")
+```
+
+* Panašu, jog transformacijos nereikia. Duomenų sklaida pradžioje ir pabaigoje panaši. Box-Cox transformacija žymių pokyčių nepadaro ir yra nenaudinga.
+
+**(b) fit a suitable ARIMA model to the transformed data using auto.arima();**
+```{r}
+arm1 <- auto.arima(wmurders); arm1
+```
+
+* Gavome ARIMA(1,2,1) modelį.
+
+**(c) try some other plausible models by experimenting with the orders chosen;**
+```{r}
+arm2 <- arima(wmurders, order = c(5,2,0))
+arm3 <- arima(wmurders, order = c(1,2,3))
+arm4 <- arima(wmurders, order = c(0,2,1))
+```
+
+**(d) choose what you think is the best model and check the residual diagnostics**
+Ieškoma geriausio modelio:
+```{r}
+accuracy(arm1)[2]
+accuracy(arm2)[2]
+accuracy(arm3)[2]
+accuracy(arm4)[2]
+```
+
+* Visų modelių RMSE reikšmės gana artimos, tačiau galima teigti, jog tiksliausias yra antrasis modelis (ARIMA(5,2,0)) - jo RMSE mažiausias.
+
+Tikriname modelių liekanas:
+```{r}
+Acf(arm1$res)
+Acf(arm2$res)
+Acf(arm3$res)
+Acf(arm4$res)
+```
+
+* Panašu, jog visų modelių liekanos yra baltasis triukšmas. Juodi brūkšneliai nekerta mėlyno punktyro.
+
+Atliekamas Ljung-Box testas patikrinti ar liekanos yra baltasis triukšmas:
+```{r}
+Box.test(arm1$res, type = "Lj")
+Box.test(arm2$res, type = "Lj")
+Box.test(arm3$res, type = "Lj")
+Box.test(arm4$res, type = "Lj")
+```
+
+* Visų modelių p-value > 0.05. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja).
+
+**(e) produce forecasts of your fitted model. Do the forecasts look reasonable?**
+```{r}
+plot(forecast(arm2, h = 20))
+```
+
+* Prognozė atrodo logiška. Panašu, jog nužudytų moterų skaičius mažės, tačiau manau reiktų prognozę patobulinti, kad mažėjimas nebūtų toks staigus.
+
+**(f) compare the results with what you would obtain using ets() (with no transformation).**
+```{r}
+obt5 <- ets(wmurders); obt5
+Acf(obt5$res)
+Box.test(obt5$res, type = "Lj")
+```
+
+* Gavome modelį ETS(M,N,N). Liekanos yra baltasis triūkšmas.
+
+```{r}
+accuracy(arm2)[2]
+accuracy(obt5)[2]
+```
+
+* Matome, jog antrojo modelio RMSE yra mažesnis, o tai rodo, kad šis modelis yra geresnis.
+
+> Taigi galime matyti, jog yra nemažai tinkamų modelių "wmurders" duomenims prognozuoti. Tačiau tinkamiausias iš pateiktų yra antrasis - (ARIMA(5,2,0).
+
+<br>
+
+### 2 užduotis:
+####For the usgdp data:
+**(a) if necessary, find a suitable Box-Cox transformation for the data;**
+```{r}
+plot(usgdp, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+la <- BoxCox.lambda(usgdp); la # Transformacijos lambda
+plot(BoxCox(usgdp, lambda = la), col = "blue", main = "Duomenys po transformacijos")
+```
+
+* Panašu, jog Box-Cox transformacija nenaudinga. Ji tik padaro duomenų grafiką tiesesniu, bet nematyti reikšmingų pokyčių.
+
+**(b) fit a suitable ARIMA model to the transformed data using auto.arima();**
+```{r}
+arim1 <- auto.arima(usgdp); arim1
+```
+
+* Gavome ARIMA(2,2,2) modelį.
+
+**(c) try some other plausible models by experimenting with the orders chosen;**
+```{r}
+arim2 <- arima(usgdp, order = c(1,2,3))
+arim3 <- arima(usgdp, order = c(0,2,7))
+arim4 <- arima(usgdp, order = c(5,1,0))
+```
+
+**(d) choose what you think is the best model and check the residual diagnostics;**
+Ieškoma geriausio modelio:
+```{r}
+accuracy(arim1)[2]
+accuracy(arim2)[2]
+accuracy(arim3)[2]
+accuracy(arim4)[2]
+```
+
+* Visų modelių RMSE reikšmės gana artimos, tačiau išsiskyria ketvirtojo modelio reikšmė - ji yra didesnė ir todėl šį modelį atmetame. Toliau galima būtų teigti, jog tiksliausias yra trečiasis modelis (ARIMA(0,2,7)) - jo RMSE mažiausias.
+
+Tikriname modelių liekanas:
+```{r}
+Acf(arim1$res)
+Acf(arim2$res)
+Acf(arim3$res)
+Acf(arim4$res)
+```
+
+* Panašu, jog visų modelių liekanos yra baltasis triukšmas. Juodi brūkšneliai nežymiai kerta mėlyną punktyrą.
+
+Atliekamas Ljung-Box testas patikrinti ar liekanos yra baltasis triukšmas:
+```{r}
+Box.test(arim1$res, type = "Lj")
+Box.test(arim2$res, type = "Lj")
+Box.test(arim3$res, type = "Lj")
+Box.test(arim4$res, type = "Lj")
+```
+
+* Visų modelių p-value > 0.05. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja).
+
+**(e) produce forecasts of your fitted model. Do the forecasts look reasonable?**
+```{r}
+plot(forecast(arim3, h = 50))
+```
+
+* Modelis gana realus - tikėtina, jog JAV BVP sparčiai augs
+
+**(f) compare the results with what you would obtain using ets() (with no transformation).**
+```{r}
+ets5 <- ets(usgdp); ets5
+Acf(ets5$res)
+Box.test(ets5$res, type = "Lj")
+```
+
+* Gavome modelį ETS(A,Ad,N). Liekanos yra baltasis triūkšmas.
+
+```{r}
+accuracy(arim3)[2]
+accuracy(ets5)[2]
+```
+
+* Matome, jog trečiojo modelio RMSE yra mažesnis, o tai rodo, kad šis modelis yra geresnis.
+
+> Taigi galime matyti, jog yra nemažai tinkamų modelių "usgdp" duomenims prognozuoti. Tačiau šiuo atveju tinkamiausias iš pateiktų yra trečiasis - (ARIMA(0,2,7).
+
+<br>
+
+### 3 užduotis:
+####For the mcopper data:
+**(a) if necessary, find a suitable Box-Cox transformation for the data;**
+```{r}
+plot(mcopper, main = "Pradiniai duomenys") # Turimų duomenų grafikas
+```
+
+* Duomenų sklaida pradžioje ir pabaigoje stipriai skiriasi. Atliksime Box-Cox transformaciją.
+
+```{r}
+l <- BoxCox.lambda(mcopper); l # Transformacijos lambda
+duom <- BoxCox(mcopper, lambda = l)
+plot(duom, col = "blue", main = "Duomenys po transformacijos")
+```
+
+* Matome, jog duomenų pasiskirstymo skirtumai galuose nebe tokie ryškūs, duomenų svyravimai tapo švelnesni. Toliau naudosime transformuotus duomenis.
+
+**(b) fit a suitable ARIMA model to the transformed data using auto.arima();**
+```{r}
+ar1 <- auto.arima(duom)
+```
+
+* Gauname ARIMA(0,1,1) modelį.
+
+**(c) try some other plausible models by experimenting with the orders chosen;**
+```{r}
+ar2 <- arima(duom, order = c(1,2,3))
+ar3 <- arima(duom, order = c(0,2,10))
+ar4 <- arima(duom, order = c(3,1,0))
+```
+
+**(d) choose what you think is the best model and check the residual diagnostics;**
+Ieškoma geriausio modelio:
+```{r}
+accuracy(ar1)[2]
+accuracy(ar2)[2]
+accuracy(ar3)[2]
+accuracy(ar4)[2]
+```
+
+* Visų modelių RMSE reikšmės gana panašios, tačiau galima būtų teigti, jog tiksliausias yra trečiasis modelis (ARIMA(0,2,10)) - jo RMSE mažiausias.
+
+Tikriname modelių liekanas:
+```{r}
+Acf(ar1$res)
+Acf(ar2$res)
+Acf(ar3$res)
+Acf(ar4$res)
+```
+
+* Panašu, jog visų modelių liekanos yra baltasis triukšmas. Juodi brūkšneliai nežymiai kerta mėlyną punktyrą.
+
+Atliekamas Ljung-Box testas patikrinti ar liekanos yra baltasis triukšmas:
+```{r}
+Box.test(ar1$res, type = "Lj")
+Box.test(ar2$res, type = "Lj")
+Box.test(ar3$res, type = "Lj")
+Box.test(ar4$res, type = "Lj")
+```
+
+* Visų modelių p-value > 0.05. Liekanos yra baltasis triukšmas (liekanos nekoreliuoja).
+
+**(e) produce forecasts of your fitted model. Do the forecasts look reasonable?**
+```{r}
+plot(forecast(ar3, h = 100))
+```
+
+* Nemanau, jog prognozė yra labai tiksli. Prognozuojama vario kaina ir nemanau, kad yra tikėtina, jog ji bus konstanta, nes kaina pastoviai kinta - staigūs svyravimai grafike.
+
+**(f) compare the results with what you would obtain using ets() (with no transformation).**
+```{r}
+ets35 <- ets(duom); ets35
+Acf(ets35$res)
+Box.test(ets35$res, type = "Lj")
+```
+
+* Gavome modelį ETS(M,Ad,N). Liekanos nėra baltasis triūkšmas (p-value < 0.05).
+
+```{r}
+accuracy(ar3)[2]
+accuracy(ets35)[2]
+```
+
+* Matome, jog trečiojo modelio RMSE yra mažesnis, o tai rodo, kad šis modelis yra geresnis.
+
+> Taigi galime matyti, jog yra nemažai tinkamų modelių "mcopper" duomenims prognozuoti. Tačiau šiuo atveju tinkamiausias iš pateiktų yra trečiasis - (ARIMA(0,2,10).
