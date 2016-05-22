@@ -1,0 +1,105 @@
+---
+title: "task15"
+author: "Manvydas Sokolovas"
+date: "20 May 2016"
+output: html_document
+---
+
+Užkraunamas "fpp" paketas:
+```{r, message=FALSE}
+library("fpp")
+```
+
+### 1 užduotis:
+Choose one of the following seasonal time series: condmilk, hsales, uselec
+
+Naudojami "uselec" duomenys. Atvaizduojami grafiškai:
+```{r}
+plot(uselec, main = "Pradiniai duomenys")
+hist(uselec, main = "Pradinių duomenų histograma")
+```
+
+* Duomenys yra sezoniški, turi kylantį trendą.
+* Histograma panaši į normalaus skirstinio, tačiau atrodo nepakankamai. Atliksime duomenų transformaciją.
+
+**(a) Do the data need transforming? If so, find a suitable transformation.**
+```{r}
+l <- BoxCox.lambda(uselec); l # Transformacijos lambda
+duom <- BoxCox(uselec, lambda = l)
+plot(duom, col = "blue", main = "Duomenys po transformacijos")
+hist(duom, main = "Transformuotų duomenų histograma")
+```
+
+* Duomenų transformacija sulygino duomenų svyravimus ir taip pat matome, jog transformuotų duomenų histograma panašesnė į normaliojo skirstinio.
+
+**(b) Are the data stationary? If not, find an appropriate differencing which yields stationary data.**
+```{r}
+kpss.test(duom) # H0: duomenys yra stacionarūs
+```
+
+* p-value < 0.05, tai H0 hipotezė atmetama. Duomenys nėra stacionarūs.
+
+```{r}
+n <- nsdiffs(duom); n
+duom2 <- diff(duom, diff = n)
+plot(duom2, main = "Diferencijuotų duomenų grafikas")
+kpss.test(duom2) # H0: duomenys yra stacionarūs
+```
+
+* Duomenys nebeturi trendo, todėl panašu, jog yra stacionarūs. KPSS testas patvirtina, jog duomenys yra stacionarūs (p-value > 0.05, H0 priimama).
+
+**(c) Identify a couple of ARIMA models that might be useful in describing the time series. Which of your models is the best according to their AIC values?**
+```{r}
+fit1 <- auto.arima(duom); fit1 # Gavome ARIMA(3,0,2)(2,1,0)[12] with drift
+fit2 <- arima(duom, order=c(1,0,2), seasonal=c(2,1,0))
+fit3 <- arima(duom, order=c(0,2,9), seasonal=c(0,0,6))
+```
+
+Palyginamos modelių AIC reikšmės:
+```{r}
+AIC(fit1)
+AIC(fit2)
+AIC(fit3)
+```
+
+* Matome, jog geriausias modelis yra pirmasis (fit1) - ARIMA(3,0,2)(2,1,0)[12]. Jo Akaike kriterijaus reikšmė yra mažiausia.
+
+**(d) Estimate the parameters of your best model and do diagnostic testing on the residuals. Do the residuals resemble white noise? If not, try to find another ARIMA model which fits better.**
+```{r}
+acf(fit1$res)
+```
+
+* Panašu, jog šio modelio liekanos yra baltasis triukšmas - tik viena linija kerta mėlyną punktyrą.
+
+Spėjimą patikrinsime atlikdami Ljung-Box testą su H0 hipoteze, jog liekanos yra baltasis triukšmas:
+```{r}
+Box.test(fit1$res, type = "Ljung")
+```
+
+* p-value > 0.05, tai H0 hipotezė priimama. Liekanos yra baltasis triukšmas.
+
+**(e) Forecast the next 24 months of data using your preferred model.**
+```{r}
+frc1 <- forecast(fit1, h = 24)
+plot(frc1, main = "Modelio ARIMA(3,0,2)(2,1,0)[12] prognozė 24 mėnesiams")
+```
+
+* Prognozė atrodo logiška.
+
+**(f) Compare the forecasts obtained using ets().**
+```{r}
+fit4 <- ets(duom)
+plot(forecast(fit4, h = 24), main = "Modelio ETS(M,Ad,M) 24 mėnėsių prognozė")
+```
+
+* Grafiškai prognozės atrodo labai panašios.
+
+Lyginamas modelių RMSE:
+```{r}
+accuracy(fit1)[2]
+accuracy(fit4)[2]
+```
+
+* ets modelio RMSE nežymiai mažesnis, taigi šis modelis ir yra tinkamesnis "uselec" duomenims prognozuoti.
+
+
