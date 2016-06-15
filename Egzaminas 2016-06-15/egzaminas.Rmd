@@ -1,0 +1,143 @@
+---
+title: "egzaminas"
+author: "Manvydas Sokolovas"
+date: "15 June 2016"
+output: html_document
+---
+
+Užkraunami reikalingi paketai:
+```{r, message=FALSE}
+library(car)
+library(fpp)
+library(dynlm)
+library(usdm)
+```
+
+### 2 užduotis:
+**1.**
+Duomenų failas įkeltas į "Egzaminas 2016-06-15" aplanką GitHub'e. Nuskaitomi ir sutvarkomi duomenys:
+a)
+```{r}
+duomvisi <- read.csv2("data_b.csv", header = TRUE)
+```
+
+b)
+```{r}
+duomenys <- duomvisi[1:(dim(duomvisi)[1]-7),] # istrinamos paskutines 7 eilutes su tekstu
+duomenys[duomenys=="NAN"] <- NA # NAN reiksmes pazymimos kaip naturimos - NA
+duomenys2 <- na.omit(duomenys) # istrinamos 5 eilutes, kuriose yra NA reiksmiu
+str(duomenys2) #perziurimas duomenu tipas ir keiciamas is factor i numeric isskyrus rajonoID
+duomenys2[,1] <- as.numeric(paste(duomenys2[,1]))
+duomenys2[,2] <- as.numeric(paste(duomenys2[,2]))
+duomenys2[,3] <- as.numeric(paste(duomenys2[,3]))
+duomenys2[,5] <- as.numeric(paste(duomenys2[,5]))
+str(duomenys2)
+```
+
+Sudaromas tiesinis modelis ir ieskoma isskirciu:
+```{r}
+mod1 <- lm(islaidosVaisiams~butinosIslaidos+pajamos+atstumasIkiParduotuves, data = duomenys2)
+outlierTest(mod1) #rodo , jog isskirtis yra 372 reiksme
+qqPlot(mod1, id.n=2) #grafikas tai patvirtina, matome, jog 372 reiksme ryskiai nutolusi nuo kitu. taip pat 272 reiksme irgi rodoma kaip isskirtis.
+duom <- duomenys2[-367,] # istrinama isskirtis (367, nes pries tai buvo istrinta 5 eilutes ir pasikeite zymejimas...)
+duom2 <- duom[-268,] # istrinama isskirtis 272 eiluteje
+duom3 <- duom2[,-4] #istrinamas 4 stulpelis, nes jis zymi namo id, jis nebus reikalingas modeliui arba tiksliau nemoku dummy variables
+```
+
+c)
+```{r}
+vif(duom3) # VIF koeficientai visu yra mazesni uz 10, multikolinearumo nera
+plot(duom3) # panasu, jog viskas gerai, kintamieji tarpusavio nekoreliuoja
+cor(duom3) # galima matyti, jog kintamieji gana stipriai koreliuoja su islaidoms vaisiams, taip pat pajamos su butinomis islaidomis
+```
+
+Atsitiktinis duomenu isskaidymas, radau internete(http://www.gettinggeneticsdone.com/2011/02/split-data-frame-into-testing-and.html):
+```{r}
+# splitdf function will return a list of training and testing sets
+splitdf =function(duom3, seed=NULL) {
+  if (!is.null(seed)) set.seed(seed)
+	index = 1:nrow(duom3)
+	trainindex = sample(index, trunc(length(index)*0.8))
+	trainset = duom3[trainindex, ]
+	testset = duom3[-trainindex, ]
+	list(trainset=trainset,testset=testset)
+}
+#apply the function
+splits = splitdf(duom3, seed=415)
+#it returns a list - two data frames called trainset and testset
+str(splits)
+# there are 75 observations in each data frame
+lapply(splits,nrow)
+#view the first few columns in each data frame
+lapply(splits,head)
+# save the training and testing sets as data frames
+trainSet = splits$trainset
+testSet = splits$testset
+```
+
+**2.**
+
+a)Sudaromas tiesinis modelis:
+```{r}
+modelis <- lm(islaidosVaisiams~butinosIslaidos+pajamos+atstumasIkiParduotuves, data = trainSet)
+```
+
+b)
+```{r}
+summary(modelis) # atstumasIkiParduotuves p-value > 0.05, tai si kintamaji manau galime atmesti
+model <- lm(islaidosVaisiams~butinosIslaidos+pajamos, data = trainSet)
+summary(model) #dabar visi kintamieji atrodo reiksmingi
+```
+
+c)
+```{r}
+vif(trainSet) # visi VIF koeficientai maziau uz 10, tai multikolinearumo problemos nera
+#Ištirti ar duomenys nėra heteroskedastiški naudojamas ncvTest:
+ncvTest(model) #Kadangi p-value < 0.05, tai H0 hipotezė atmetama - duomenys nera homoskedastiški.
+acf(model$res) # panasu, jog paklaidos yra baltasis triuksmas - tik viena reiksme kerta melyna punktyra
+Box.test(model$res, type = "Ljung") #p-value > 0.05, tai H0 hipotezė priimama. Liekanos yra baltasis triukšmas.
+```
+
+### 3 užduotis:
+
+Pasizymime reikalingus duomenis:
+```{r}
+data <- M1Germany
+
+```
+
+**1.**
+a2) 
+```{r}
+modeliz <- dynlm(logprice~L(loggnp,1)+L(loggnp,2),data)
+```
+
+b)
+```{r}
+ser <- ts(modeliz$res)
+```
+
+c)
+```{r}
+kpss.test(ser) #p-value < 0.05. H0 hipotezė atmetama. Duomenys nera stacionarūs.
+l1 <- BoxCox.lambda(ser); l1 # Transformacijos lambda
+n1 <- ndiffs(ser); n1 # Diferenciavimo eilė
+kpss.test(diff(BoxCox(ser, lambda = l1), diff = n1))
+ser2 <- (diff(BoxCox(ser, lambda = l1), diff = n1))
+```
+
+* "kpss.test" p-value = 0.1 > 0.05, tai H0 hipotezė priimama, duomenys yra stacionarūs.
+
+modeliavimas:
+
+```{r}
+mod1 <- ets(ser2)
+mod1 #Gavome ETS(A,N,N) nesezoninis
+```
+
+
+```{r}
+mod3 <- holt(ser2, h=100, damped=TRUE)
+plot(mod3, main="Prognozė su eksponentiniu trendu")
+lines(fitted(mod3), col="green")
+```
