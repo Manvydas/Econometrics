@@ -108,34 +108,6 @@ durbinWatsonTest(mod5)
 # p-value > 0.05 - liekanos nėra autokoreliuotos.
 ```
 
-
-```{r}
-mod4 <- lm(kaina~plotas+aukstas+silumosLaidumas, data=duom2)
-mod5 <- lm(kaina~plotas+aukstas+garsoIzoliacija, data=duom2)
-```
-
-Lieka išsiaškinti, kuris modelis geresnis. Tam naudojamas Akaike kriterijus - kuo mažesnis, tuo geriau:
-
-```{r}
-AIC(mod4)
-AIC(mod5)
-# Pagal ši kriterijų mod5 gerenis nei mod4.
-```
-
-Išsiaškinti ar duomenys nėra heteroskedastiški naudojamas ncvTest:
-
-```{r}
-ncvTest(mod5)
-# Kadangi p-value > 0.05, tai H0 hipotezė priimama - duomenys homoskedastiški.
-```
-
-Tikrinama autokoreliacija:
-
-```{r}
-durbinWatsonTest(mod5)
-# p-value > 0.05 - liekanos nėra autokoreliuotos.
-```
-
 Pagal galutinį modelį kaina priklauso nuo ploto, auksto ir garso izoliacijos. Galutinis modelis yra: kaina = 7474.4 + 599.4plotas + 334aukstas + 581.2garsoIzoliacija + e. Koeficientai parodo kiek pakis kaina pakitus vienam iš kintamujų vienu vienetu, o kitiems išlikus pastoviais.
 
 
